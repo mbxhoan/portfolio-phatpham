@@ -130,4 +130,5 @@ export interface Portfolio {
     instagram?: { visible: boolean; url: string };
     youtube?: { visible: boolean; url: string };
   };
+  adminPassword?: string;
 }

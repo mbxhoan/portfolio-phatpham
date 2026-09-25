@@ -56,6 +56,24 @@ export default function AboutAdmin() {
   const [confirmField, setConfirmField] = useState<number | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
 
+  const [passOpen, setPassOpen] = useState(false);
+  const [passDraft, setPassDraft] = useState({ newPass: "", confirmPass: "" });
+
+  function savePass() {
+    if (!passDraft.newPass.trim()) {
+      toast("Vui lòng nhập mật khẩu mới");
+      return;
+    }
+    if (passDraft.newPass !== passDraft.confirmPass) {
+      toast("Mật khẩu xác nhận không khớp");
+      return;
+    }
+    update((d) => ({ ...d, adminPassword: passDraft.newPass.trim() }));
+    setPassOpen(false);
+    setPassDraft({ newPass: "", confirmPass: "" });
+    toast("Đã cập nhật mật khẩu Admin mới!");
+  }
+
   const [fieldsHeaderOpen, setFieldsHeaderOpen] = useState(false);
   const [fieldsHeaderDraft, setFieldsHeaderDraft] = useState({
     title: data.fieldsTitle || "Lĩnh vực hoạt động",
@@ -712,6 +730,27 @@ export default function AboutAdmin() {
 
 
 
+      <Panel
+        eyebrow="Bảo mật tài khoản Admin"
+        action={
+          <AdminButton variant="ghost" onClick={() => setPassOpen(true)}>
+            <Pencil size={15} /> Đổi mật khẩu Admin
+          </AdminButton>
+        }
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-5">
+          <div>
+            <p className="text-sm font-bold text-adminink">Mật khẩu truy cập Admin</p>
+            <p className="mt-0.5 text-[13px] text-[#697086]">
+              {data.adminPassword ? "Bạn đã cài đặt mật khẩu tùy chỉnh riêng." : "Đang sử dụng mật khẩu hệ thống mặc định."}
+            </p>
+          </div>
+          <AdminButton variant="ghost" onClick={() => setPassOpen(true)}>
+            <Pencil size={15} /> Đổi mật khẩu
+          </AdminButton>
+        </div>
+      </Panel>
+
       <Panel eyebrow="Khôi phục">
         <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-5">
           <p className="text-[13px] text-[#697086]">Xóa mọi chỉnh sửa đã lưu và đưa nội dung về mặc định ban đầu.</p>
@@ -1079,6 +1118,38 @@ export default function AboutAdmin() {
       </Modal>
 
       <ConfirmDialog open={confirmField !== null} label={confirmField !== null ? data.fields[confirmField]?.name ?? "" : ""} onCancel={() => setConfirmField(null)} onConfirm={removeField} />
+
+      {/* change password modal */}
+      <Modal
+        open={passOpen}
+        onClose={() => setPassOpen(false)}
+        title="Đổi mật khẩu truy cập Admin CMS"
+        footer={
+          <>
+            <AdminButton variant="ghost" onClick={() => setPassOpen(false)}>Hủy</AdminButton>
+            <AdminButton onClick={savePass}>Lưu mật khẩu mới</AdminButton>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <Field label="Mật khẩu mới">
+            <Input
+              type="password"
+              value={passDraft.newPass}
+              onChange={(e) => setPassDraft({ ...passDraft, newPass: e.target.value })}
+              placeholder="Nhập mật khẩu mới..."
+            />
+          </Field>
+          <Field label="Xác nhận mật khẩu mới">
+            <Input
+              type="password"
+              value={passDraft.confirmPass}
+              onChange={(e) => setPassDraft({ ...passDraft, confirmPass: e.target.value })}
+              placeholder="Nhập lại mật khẩu mới..."
+            />
+          </Field>
+        </div>
+      </Modal>
 
       {/* reset confirm */}
       <Modal open={resetOpen} onClose={() => setResetOpen(false)} title="Khôi phục nội dung gốc"

@@ -6,6 +6,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { SESSION_COOKIE, checkPassword, isValidSession, sessionToken } from "@/lib/admin-auth";
+import { readPortfolio } from "@/lib/blob";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,12 +26,15 @@ export async function POST(req: NextRequest) {
     /* empty/invalid body → treated as wrong password */
   }
 
-  if (!checkPassword(password)) {
+  const override = await readPortfolio();
+  const customPass = override?.adminPassword;
+
+  if (!checkPassword(password, customPass)) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(SESSION_COOKIE, sessionToken(), {
+  res.cookies.set(SESSION_COOKIE, sessionToken(customPass), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

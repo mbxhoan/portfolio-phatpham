@@ -14,26 +14,27 @@ import crypto from "crypto";
 
 export const SESSION_COOKIE = "phat-admin-session";
 
-/** Admin password, from env with a demo fallback. */
-function adminPassword(): string {
+/** Admin password, from env with default fallback. */
+export function adminPassword(): string {
   return process.env.ADMIN_PASSWORD || "12345678";
 }
 
 /** Deterministic, unguessable token derived from the password. */
-export function sessionToken(): string {
+export function sessionToken(customPass?: string): string {
+  const target = customPass || adminPassword();
   return crypto
     .createHash("sha256")
-    .update(`phat-portfolio-session:${adminPassword()}`)
+    .update(`phat-portfolio-session:${target}`)
     .digest("hex");
 }
 
-/** True if the supplied password matches the configured admin password or default fallback. */
-export function checkPassword(password: string): boolean {
+/** True if the supplied password matches the configured or custom admin password. */
+export function checkPassword(password: string, customPass?: string): boolean {
   if (!password) return false;
-  const trimmed = password.trim();
-  const configured = adminPassword().trim();
-  // Always accept default "12345678" or the configured env password
-  return trimmed === "12345678" || trimmed === configured;
+  const target = customPass || adminPassword();
+  const a = Buffer.from(password);
+  const b = Buffer.from(target);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
 /** True if a request cookie value is a valid session token. */
