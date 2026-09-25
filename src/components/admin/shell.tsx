@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 const links = [
   { href: "/admin", label: "Tổng quan", Icon: LayoutDashboard },
   { href: "/admin/gioi-thieu", label: "Giới thiệu", Icon: UserRound },
-  { href: "/admin/nang-luc", label: "Năng lực cá nhân", Icon: Layers },
+  { href: "/admin/nang-luc", label: "Năng lực", Icon: Layers },
   { href: "/admin/du-an", label: "Dự án", Icon: FolderKanban },
   { href: "/admin/tin-nhan", label: "Tin nhắn", Icon: MessageSquare },
 ];
@@ -33,7 +33,7 @@ const links = [
 const titles: Record<string, string> = {
   "/admin": "Tổng quan",
   "/admin/gioi-thieu": "Giới thiệu",
-  "/admin/nang-luc": "Năng lực cá nhân",
+  "/admin/nang-luc": "Năng lực",
   "/admin/du-an": "Dự án",
   "/admin/tin-nhan": "Tin nhắn",
 };

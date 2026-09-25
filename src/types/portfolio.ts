@@ -22,6 +22,7 @@ export interface Person {
   tagline: string;
   email: string;
   address: string;
+  phone?: string;
   yearsBadge: { value: string; label: string };
   /** Optional hero portrait image (data URL or path). When set, replaces the SVG placeholder. */
   photo?: string;
@@ -87,15 +88,19 @@ export interface Social {
   label: string;
   href: string;
   icon: IconName;
+  visible?: boolean;
 }
 
 export interface Message {
   id: number;
   name: string;
   email: string;
+  phone?: string;
+  company?: string;
   subject: string;
   preview: string;
   time: string;
+  createdAt?: number;
   status: "new" | "read";
 }
 
@@ -106,19 +111,34 @@ export interface Stat {
   icon: IconName;
 }
 
+export interface SocialItemConfig {
+  visible: boolean;
+  url: string;
+}
+
 export interface Portfolio {
   person: Person;
   fieldsTitle?: string;
   fieldsSubtitle?: string;
   fields: Field[];
+  capabilitiesPageTitle?: string;
+  capabilitiesPageSubtitle?: string;
+  capabilitiesSectionTitle?: string;
+  capabilitiesSectionSubtitle?: string;
   capabilities: Capability[];
+  toolsSectionTitle?: string;
+  toolsSectionSubtitle?: string;
   tools: Capability[];
   processTitle?: string;
   processSubtitle?: string;
   process: ProcessStep[];
   projectsTitle?: string;
   projectsSubtitle?: string;
+  projectsPageTitle?: string;
+  projectsPageSubtitle?: string;
   projects: Project[];
+  contactTitle?: string;
+  contactSubtitle?: string;
   categories: string[];
   socials: Social[];
   messages: Message[];
@@ -126,9 +146,15 @@ export interface Portfolio {
   /** Optional editable site assets (OG image, favicon). */
   site?: SiteAssets;
   footerSocials?: {
-    facebook?: { visible: boolean; url: string };
-    instagram?: { visible: boolean; url: string };
-    youtube?: { visible: boolean; url: string };
+    facebook?: SocialItemConfig;
+    zalo?: SocialItemConfig;
+    email?: SocialItemConfig;
+    shopee?: SocialItemConfig;
+    tiktok?: SocialItemConfig;
+    instagram?: SocialItemConfig;
+    youtube?: SocialItemConfig;
+    linkedin?: SocialItemConfig;
+    github?: SocialItemConfig;
   };
   adminPassword?: string;
 }

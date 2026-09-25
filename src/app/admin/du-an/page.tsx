@@ -20,14 +20,14 @@ export default function ProjectsAdmin() {
 
   const [headerOpen, setHeaderOpen] = useState(false);
   const [headerDraft, setHeaderDraft] = useState({
-    title: data.projectsTitle || "Dự án tiêu biểu",
-    subtitle: data.projectsSubtitle || "Các sản phẩm & hệ thống thực tế tôi đã tham gia phân tích, thiết kế và triển khai cho doanh nghiệp.",
+    title: data.projectsPageTitle || "Danh sách dự án",
+    subtitle: data.projectsPageSubtitle || "Tuyển tập các hệ thống tôi đã phân tích và triển khai — từ quản lý kho, ERP đến các giải pháp IoT.",
   });
 
   function openHeader() {
     setHeaderDraft({
-      title: data.projectsTitle || "Dự án tiêu biểu",
-      subtitle: data.projectsSubtitle || "Các sản phẩm & hệ thống thực tế tôi đã tham gia phân tích, thiết kế và triển khai cho doanh nghiệp.",
+      title: data.projectsPageTitle || "Danh sách dự án",
+      subtitle: data.projectsPageSubtitle || "Tuyển tập các hệ thống tôi đã phân tích và triển khai — từ quản lý kho, ERP đến các giải pháp IoT.",
     });
     setHeaderOpen(true);
   }
@@ -35,11 +35,11 @@ export default function ProjectsAdmin() {
   function saveHeader() {
     update((d) => ({
       ...d,
-      projectsTitle: headerDraft.title,
-      projectsSubtitle: headerDraft.subtitle,
+      projectsPageTitle: headerDraft.title.trim() || "Danh sách dự án",
+      projectsPageSubtitle: headerDraft.subtitle.trim(),
     }));
     setHeaderOpen(false);
-    toast("Đã cập nhật tiêu đề & mô tả Dự án tiêu biểu");
+    toast("Đã cập nhật tiêu đề & mô tả trang Dự án");
   }
 
   function openNew() { setDraft(empty); setEditing(-1); }
@@ -83,9 +83,9 @@ export default function ProjectsAdmin() {
         <div className="border-b border-black/5 bg-slate-50/70 px-6 py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#697086]">Tiêu đề phần ở trang chủ:</span>
-              <h4 className="font-bold text-adminink text-base mt-0.5">{data.projectsTitle || "Dự án tiêu biểu"}</h4>
-              <p className="text-xs text-[#5f6472] mt-0.5 max-w-[650px]">{data.projectsSubtitle || "Các sản phẩm & hệ thống thực tế..."}</p>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#697086]">Tiêu đề & mô tả trên trang Dự án:</span>
+              <h4 className="font-bold text-adminink text-base mt-0.5">{data.projectsPageTitle || "Danh sách dự án"}</h4>
+              <p className="text-xs text-[#5f6472] mt-0.5 max-w-[650px]">{data.projectsPageSubtitle || "Tuyển tập các hệ thống tôi đã phân tích và triển khai..."}</p>
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function ProjectsAdmin() {
       <Modal
         open={headerOpen}
         onClose={() => setHeaderOpen(false)}
-        title="Sửa tiêu đề & mô tả Dự án tiêu biểu"
+        title="Sửa tiêu đề & mô tả trang Dự án"
         footer={
           <>
             <AdminButton variant="ghost" onClick={() => setHeaderOpen(false)}>Hủy</AdminButton>
@@ -135,14 +135,14 @@ export default function ProjectsAdmin() {
         }
       >
         <div className="flex flex-col gap-4">
-          <Field label="Tiêu đề phần">
+          <Field label="Tiêu đề trang Dự án">
             <Input
               value={headerDraft.title}
               onChange={(e) => setHeaderDraft({ ...headerDraft, title: e.target.value })}
-              placeholder="VD: Dự án tiêu biểu"
+              placeholder="VD: Danh sách dự án"
             />
           </Field>
-          <Field label="Mô tả ngắn (Phụ đề phần)">
+          <Field label="Mô tả ngắn (Phụ đề trang Dự án)">
             <Textarea
               value={headerDraft.subtitle}
               onChange={(e) => setHeaderDraft({ ...headerDraft, subtitle: e.target.value })}

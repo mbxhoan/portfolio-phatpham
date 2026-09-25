@@ -5,6 +5,7 @@ import { Pencil, Trash2, UserRound, ImagePlus, Zap, GripVertical } from "lucide-
 import { PageHead, Panel, Table, Th, Td, Badge, IconAction, AddButton, AdminButton, Modal, ConfirmDialog, Field, Input, Textarea, Checkbox, useToast } from "@/components/admin/ui";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { usePortfolio } from "@/lib/store";
+import { SOCIAL_PLATFORMS } from "@/lib/socials";
 import { iconMap, Icon } from "@/lib/icon-map";
 import type { IconName } from "@/types/portfolio";
 
@@ -29,6 +30,9 @@ export default function AboutAdmin() {
     name: p.name,
     role: p.role,
     tagline: p.tagline,
+    email: p.email || "",
+    address: p.address || "",
+    phone: p.phone || "",
     photo: p.photo,
     yearsValue: p.yearsBadge?.value || "",
     yearsLabel: p.yearsBadge?.label || "",
@@ -214,6 +218,9 @@ export default function AboutAdmin() {
       name: p.name,
       role: p.role,
       tagline: p.tagline,
+      email: p.email || "",
+      address: p.address || "",
+      phone: p.phone || "",
       photo: p.photo,
       yearsValue: p.yearsBadge?.value || "",
       yearsLabel: p.yearsBadge?.label || "",
@@ -245,6 +252,9 @@ export default function AboutAdmin() {
         name: infoDraft.name,
         role: infoDraft.role,
         tagline: infoDraft.tagline,
+        email: infoDraft.email,
+        address: infoDraft.address,
+        phone: infoDraft.phone,
         photo: infoDraft.photo,
         yearsBadge: { value: infoDraft.yearsValue, label: infoDraft.yearsLabel },
         showCapabilityLink: infoDraft.quickLinks.capability.visible,
@@ -291,6 +301,9 @@ export default function AboutAdmin() {
   const infoRows: [string, string][] = [
     ["Họ tên", p.name],
     ["Chức danh", p.role],
+    ["Hotline / Số điện thoại", p.phone || "Chưa cập nhật"],
+    ["Email liên hệ", p.email],
+    ["Địa chỉ", p.address],
     ["Tự giới thiệu", p.tagline],
     ["Huy hiệu kinh nghiệm", `${p.yearsBadge.value} · ${p.yearsBadge.label}`],
     ["Truy cập nhanh năng lực", p.showCapabilityLink !== false ? "Bật" : "Tắt"],
@@ -323,122 +336,62 @@ export default function AboutAdmin() {
         </div>
       </Panel>
 
-      <Panel eyebrow="Liên kết mạng xã hội (Footer)">
-        <div className="grid gap-6 px-6 py-6 sm:grid-cols-3">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[13px] font-bold text-adminink">Facebook</span>
-              <Checkbox
-                label="Hiển thị"
-                checked={data.footerSocials?.facebook?.visible !== false}
-                onChange={(e) => {
-                  update((d) => ({
-                    ...d,
-                    footerSocials: {
-                      ...d.footerSocials,
-                      facebook: {
-                        url: d.footerSocials?.facebook?.url || "",
-                        visible: e.target.checked,
+      <Panel eyebrow="Liên kết mạng xã hội & Kênh bán hàng (Footer & Thẻ Liên hệ)">
+        <div className="grid gap-5 px-6 py-6 sm:grid-cols-3">
+          {SOCIAL_PLATFORMS.map((platform) => {
+            const item = data.footerSocials?.[platform.id as keyof typeof data.footerSocials];
+            const isVisible = item ? item.visible !== false : (platform.id === "facebook" || platform.id === "zalo" || platform.id === "email");
+            const currentUrl = item?.url !== undefined ? item.url : platform.defaultUrl;
+            const IconCmp = platform.icon;
+
+            return (
+              <div key={platform.id} className="rounded-xl border border-black/5 bg-slate-50/60 p-4">
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="text-[13px] font-bold text-adminink flex items-center gap-2">
+                    <span className="grid h-7 w-7 place-items-center rounded-lg bg-soft-2 text-brand">
+                      <IconCmp size={15} />
+                    </span>
+                    {platform.label}
+                  </span>
+                  <Checkbox
+                    label="Hiển thị"
+                    checked={isVisible}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      update((d) => ({
+                        ...d,
+                        footerSocials: {
+                          ...d.footerSocials,
+                          [platform.id]: {
+                            url: d.footerSocials?.[platform.id as keyof typeof d.footerSocials]?.url || currentUrl,
+                            visible: checked,
+                          },
+                        },
+                      }));
+                      toast(`Đã ${checked ? "bật" : "tắt"} hiển thị ${platform.label}`);
+                    }}
+                  />
+                </div>
+                <Input
+                  value={currentUrl}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    update((d) => ({
+                      ...d,
+                      footerSocials: {
+                        ...d.footerSocials,
+                        [platform.id]: {
+                          visible: d.footerSocials?.[platform.id as keyof typeof d.footerSocials]?.visible !== false,
+                          url: val,
+                        },
                       },
-                    },
-                  }));
-                  toast("Đã cập nhật hiển thị Facebook");
-                }}
-              />
-            </div>
-            <Input
-              value={data.footerSocials?.facebook?.url || ""}
-              onChange={(e) => {
-                update((d) => ({
-                  ...d,
-                  footerSocials: {
-                    ...d.footerSocials,
-                    facebook: {
-                      visible: d.footerSocials?.facebook?.visible !== false,
-                      url: e.target.value,
-                    },
-                  },
-                }));
-              }}
-              placeholder="https://facebook.com/..."
-            />
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[13px] font-bold text-adminink">Instagram</span>
-              <Checkbox
-                label="Hiển thị"
-                checked={data.footerSocials?.instagram?.visible !== false}
-                onChange={(e) => {
-                  update((d) => ({
-                    ...d,
-                    footerSocials: {
-                      ...d.footerSocials,
-                      instagram: {
-                        url: d.footerSocials?.instagram?.url || "",
-                        visible: e.target.checked,
-                      },
-                    },
-                  }));
-                  toast("Đã cập nhật hiển thị Instagram");
-                }}
-              />
-            </div>
-            <Input
-              value={data.footerSocials?.instagram?.url || ""}
-              onChange={(e) => {
-                update((d) => ({
-                  ...d,
-                  footerSocials: {
-                    ...d.footerSocials,
-                    instagram: {
-                      visible: d.footerSocials?.instagram?.visible !== false,
-                      url: e.target.value,
-                    },
-                  },
-                }));
-              }}
-              placeholder="https://instagram.com/..."
-            />
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[13px] font-bold text-adminink">YouTube</span>
-              <Checkbox
-                label="Hiển thị"
-                checked={data.footerSocials?.youtube?.visible !== false}
-                onChange={(e) => {
-                  update((d) => ({
-                    ...d,
-                    footerSocials: {
-                      ...d.footerSocials,
-                      youtube: {
-                        url: d.footerSocials?.youtube?.url || "",
-                        visible: e.target.checked,
-                      },
-                    },
-                  }));
-                  toast("Đã cập nhật hiển thị YouTube");
-                }}
-              />
-            </div>
-            <Input
-              value={data.footerSocials?.youtube?.url || ""}
-              onChange={(e) => {
-                update((d) => ({
-                  ...d,
-                  footerSocials: {
-                    ...d.footerSocials,
-                    youtube: {
-                      visible: d.footerSocials?.youtube?.visible !== false,
-                      url: e.target.value,
-                    },
-                  },
-                }));
-              }}
-              placeholder="https://youtube.com/..."
-            />
-          </div>
+                    }));
+                  }}
+                  placeholder={platform.placeholder}
+                />
+              </div>
+            );
+          })}
         </div>
       </Panel>
 
@@ -757,6 +710,11 @@ export default function AboutAdmin() {
               <Field label="Họ tên"><Input value={infoDraft.name} onChange={(e) => setInfoDraft({ ...infoDraft, name: e.target.value })} /></Field>
               <Field label="Chức danh"><Input value={infoDraft.role} onChange={(e) => setInfoDraft({ ...infoDraft, role: e.target.value })} /></Field>
             </div>
+            <div className="grid grid-cols-2 gap-3.5">
+              <Field label="Hotline / Số điện thoại"><Input value={infoDraft.phone} onChange={(e) => setInfoDraft({ ...infoDraft, phone: e.target.value })} placeholder="VD: 0987 654 321" /></Field>
+              <Field label="Email liên hệ"><Input value={infoDraft.email} onChange={(e) => setInfoDraft({ ...infoDraft, email: e.target.value })} placeholder="VD: phamphat343@gmail.com" /></Field>
+            </div>
+            <Field label="Địa chỉ"><Input value={infoDraft.address} onChange={(e) => setInfoDraft({ ...infoDraft, address: e.target.value })} placeholder="VD: District 1, Ho Chi Minh City, VN" /></Field>
             <Field label="Tự giới thiệu"><Textarea value={infoDraft.tagline} onChange={(e) => setInfoDraft({ ...infoDraft, tagline: e.target.value })} /></Field>
             <div className="grid grid-cols-2 gap-3.5">
               <Field label="Huy hiệu — số năm"><Input value={infoDraft.yearsValue} onChange={(e) => setInfoDraft({ ...infoDraft, yearsValue: e.target.value })} placeholder="VD: 2+ năm" /></Field>

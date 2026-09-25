@@ -16,6 +16,7 @@ export const portfolio: Portfolio = {
       "Hơn 2 năm kinh nghiệm tư vấn và triển khai phần mềm cho doanh nghiệp. Chuyên sâu về hệ thống Quản lý kho (WMS), ERP, và tích hợp phần cứng (PDA, máy in công nghiệp). Tôi giúp biến các bài toán vận hành phức tạp thành phần mềm tinh gọn, hiệu quả.",
     email: "phamphat343@gmail.com",
     address: "District 1, Ho Chi Minh City, VN",
+    phone: "0987 654 321",
     yearsBadge: { value: "2+ năm", label: "BA · WMS · ERP" },
     quickLinks: {
       capability: { visible: true, label: "Năng lực chuyên môn", color: "#004AC6" },
@@ -48,7 +49,11 @@ export const portfolio: Portfolio = {
     },
   ],
 
-  // “Năng lực chuyên môn”
+  // “Năng lực” page headers
+  capabilitiesPageTitle: "Năng lực",
+  capabilitiesPageSubtitle: "Năng lực chuyên môn và bộ công cụ phục vụ phân tích, đặc tả và số hóa vận hành doanh nghiệp.",
+  capabilitiesSectionTitle: "Năng lực chuyên môn",
+  capabilitiesSectionSubtitle: "Bộ kỹ năng cốt lõi giúp tôi phân tích, đặc tả và đồng hành cùng đội phát triển từ ý tưởng đến vận hành.",
   capabilities: [
     { name: "BPMN", icon: "workflow", body: "Nắm vững kiến thức về BPMN. Có khả năng mô hình hóa quy trình nghiệp vụ một cách trực quan, logic, giúp các bên liên quan dễ dàng hiểu và thống nhất luồng xử lý." },
     { name: "SQL", icon: "database", body: "Có kiến thức về SQL, có thể truy vấn dữ liệu, kiểm tra và hỗ trợ phân tích dữ liệu phục vụ cho việc làm rõ yêu cầu và kiểm thử hệ thống." },
@@ -59,6 +64,8 @@ export const portfolio: Portfolio = {
   ],
 
   // “Công cụ”
+  toolsSectionTitle: "Công cụ",
+  toolsSectionSubtitle: "Những công cụ tôi sử dụng hằng ngày để mô hình hóa, quản lý và bàn giao công việc.",
   tools: [
     { name: "Postman", icon: "plug", body: "Đọc tài liệu, test API, hỗ trợ tích hợp và trao đổi dữ liệu giữa các hệ thống." },
     { name: "Draw.io / Miro", icon: "penTool", body: "Mô hình hóa quy trình (BPMN, flowchart) trực quan, giúp các bên liên quan dễ hiểu và thống nhất nghiệp vụ." },
@@ -82,6 +89,10 @@ export const portfolio: Portfolio = {
 
   projectsTitle: "Dự án tiêu biểu",
   projectsSubtitle: "Các sản phẩm & hệ thống thực tế tôi đã tham gia phân tích, thiết kế và triển khai cho doanh nghiệp.",
+  projectsPageTitle: "Danh sách dự án",
+  projectsPageSubtitle: "Tuyển tập các hệ thống tôi đã phân tích và triển khai — từ quản lý kho, ERP đến các giải pháp IoT.",
+  contactTitle: "Liên hệ",
+  contactSubtitle: "Bạn đã sẵn sàng thiết kế kiến trúc hạ tầng kỹ thuật số tiếp theo của mình chưa? Hãy cùng nhau thu hẹp khoảng cách giữa logic phức tạp và trải nghiệm người dùng liền mạch.",
   projects: [
     {
       slug: "wms-an-thien", logo: "AT", featured: true,
@@ -166,9 +177,15 @@ export const portfolio: Portfolio = {
     { label: "Lượt tương tác", value: "15.650", sub: "98% KPI · hiệu suất tổng thể", icon: "trendingUp" },
   ],
   footerSocials: {
-    facebook: { visible: true, url: "#" },
-    instagram: { visible: true, url: "#" },
-    youtube: { visible: true, url: "#" },
+    facebook: { visible: true, url: "https://facebook.com" },
+    zalo: { visible: true, url: "https://zalo.me" },
+    email: { visible: true, url: "mailto:phamphat343@gmail.com" },
+    shopee: { visible: false, url: "" },
+    tiktok: { visible: false, url: "" },
+    instagram: { visible: true, url: "" },
+    youtube: { visible: true, url: "" },
+    linkedin: { visible: false, url: "" },
+    github: { visible: false, url: "" },
   },
 };
 
@@ -180,6 +197,7 @@ export const emptySkeleton: Portfolio = {
     tagline: "Vui lòng cập nhật thông tin giới thiệu bản thân...",
     email: "email@example.com",
     address: "Địa chỉ của bạn",
+    phone: "0987 654 321",
     yearsBadge: { value: "0 năm", label: "Kinh nghiệm" },
     quickLinks: {
       capability: { visible: true, label: "Năng lực chuyên môn", color: "#004AC6" },
@@ -192,7 +210,13 @@ export const emptySkeleton: Portfolio = {
   fieldsSubtitle: "Vui lòng thêm các lĩnh vực hoạt động tại trang quản trị.",
   fields: [],
 
+  capabilitiesPageTitle: "Năng lực",
+  capabilitiesPageSubtitle: "Năng lực chuyên môn và bộ công cụ phục vụ phân tích, đặc tả và số hóa vận hành doanh nghiệp.",
+  capabilitiesSectionTitle: "Năng lực chuyên môn",
+  capabilitiesSectionSubtitle: "Bộ kỹ năng cốt lõi giúp tôi phân tích, đặc tả và đồng hành cùng đội phát triển từ ý tưởng đến vận hành.",
   capabilities: [],
+  toolsSectionTitle: "Công cụ",
+  toolsSectionSubtitle: "Những công cụ tôi sử dụng hằng ngày để mô hình hóa, quản lý và bàn giao công việc.",
   tools: [],
 
   processTitle: "Quy trình Hợp tác",
@@ -203,6 +227,10 @@ export const emptySkeleton: Portfolio = {
 
   projectsTitle: "Dự án tiêu biểu",
   projectsSubtitle: "Vui lòng thêm các dự án tại trang quản trị.",
+  projectsPageTitle: "Danh sách dự án",
+  projectsPageSubtitle: "Tuyển tập các hệ thống tôi đã phân tích và triển khai — từ quản lý kho, ERP đến các giải pháp IoT.",
+  contactTitle: "Liên hệ",
+  contactSubtitle: "Bạn đã sẵn sàng thiết kế kiến trúc hạ tầng kỹ thuật số tiếp theo của mình chưa? Hãy cùng nhau thu hẹp khoảng cách giữa logic phức tạp và trải nghiệm người dùng liền mạch.",
   projects: [],
 
   socials: [
@@ -221,8 +249,14 @@ export const emptySkeleton: Portfolio = {
   ],
   footerSocials: {
     facebook: { visible: true, url: "#" },
-    instagram: { visible: true, url: "#" },
-    youtube: { visible: true, url: "#" },
+    zalo: { visible: true, url: "#" },
+    email: { visible: true, url: "mailto:email@example.com" },
+    shopee: { visible: false, url: "" },
+    tiktok: { visible: false, url: "" },
+    instagram: { visible: false, url: "" },
+    youtube: { visible: false, url: "" },
+    linkedin: { visible: false, url: "" },
+    github: { visible: false, url: "" },
   },
 };
 

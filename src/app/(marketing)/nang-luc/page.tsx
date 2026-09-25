@@ -4,7 +4,7 @@ import { CTA } from "@/components/home/cta";
 import { CapabilitiesView } from "@/components/home/capabilities-view";
 
 export const metadata: Metadata = {
-  title: "Năng lực cá nhân",
+  title: "Năng lực",
   description:
     "Năng lực chuyên môn và bộ công cụ của Phạm Minh Phát: BPMN, SQL, API, Agile/Scrum, phân tích yêu cầu và các công cụ BA chuyên nghiệp.",
 };

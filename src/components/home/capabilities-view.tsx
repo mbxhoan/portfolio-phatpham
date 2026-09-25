@@ -37,8 +37,11 @@ export function CapabilitiesView() {
         <div className="container-x">
           <SectionHeading
             center={false}
-            title="Năng lực chuyên môn"
-            subtitle="Bộ kỹ năng cốt lõi giúp tôi phân tích, đặc tả và đồng hành cùng đội phát triển từ ý tưởng đến vận hành."
+            title={data.capabilitiesSectionTitle || "Năng lực chuyên môn"}
+            subtitle={
+              data.capabilitiesSectionSubtitle ||
+              "Bộ kỹ năng cốt lõi giúp tôi phân tích, đặc tả và đồng hành cùng đội phát triển từ ý tưởng đến vận hành."
+            }
           />
           <CapabilityGrid items={data.capabilities} />
         </div>
@@ -48,8 +51,11 @@ export function CapabilitiesView() {
         <div className="container-x">
           <SectionHeading
             center={false}
-            title="Công cụ"
-            subtitle="Những công cụ tôi sử dụng hằng ngày để mô hình hóa, quản lý và bàn giao công việc."
+            title={data.toolsSectionTitle || "Công cụ"}
+            subtitle={
+              data.toolsSectionSubtitle ||
+              "Những công cụ tôi sử dụng hằng ngày để mô hình hóa, quản lý và bàn giao công việc."
+            }
           />
           <CapabilityGrid items={data.tools} />
         </div>
