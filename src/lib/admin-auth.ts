@@ -32,8 +32,8 @@ export function sessionToken(customPass?: string): string {
 export function checkPassword(password: string, customPass?: string): boolean {
   if (!password) return false;
   const target = customPass || adminPassword();
-  const a = Buffer.from(password);
-  const b = Buffer.from(target);
+  const a = new Uint8Array(Buffer.from(password));
+  const b = new Uint8Array(Buffer.from(target));
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
@@ -41,7 +41,7 @@ export function checkPassword(password: string, customPass?: string): boolean {
 export function isValidSession(cookieValue: string | undefined): boolean {
   if (!cookieValue) return false;
   const token = sessionToken();
-  const a = Buffer.from(cookieValue);
-  const b = Buffer.from(token);
+  const a = new Uint8Array(Buffer.from(cookieValue));
+  const b = new Uint8Array(Buffer.from(token));
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
