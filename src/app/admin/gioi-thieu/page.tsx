@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2, UserRound, ImagePlus, RotateCcw, Zap, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
+import { Pencil, Trash2, UserRound, ImagePlus, Zap, GripVertical } from "lucide-react";
 import { PageHead, Panel, Table, Th, Td, Badge, IconAction, AddButton, AdminButton, Modal, ConfirmDialog, Field, Input, Textarea, Checkbox, useToast } from "@/components/admin/ui";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { usePortfolio } from "@/lib/store";
@@ -20,7 +20,7 @@ const COLOR_PRESETS = [
 
 export default function AboutAdmin() {
   const toast = useToast();
-  const { data, update, reset } = usePortfolio();
+  const { data, update } = usePortfolio();
   const p = data.person;
 
   const [infoOpen, setInfoOpen] = useState(false);
@@ -54,25 +54,6 @@ export default function AboutAdmin() {
   const [fieldEdit, setFieldEdit] = useState<number | null>(null); // -1 new
   const [fieldDraft, setFieldDraft] = useState<{ name: string; body: string; visible: boolean }>({ name: "", body: "", visible: true });
   const [confirmField, setConfirmField] = useState<number | null>(null);
-  const [resetOpen, setResetOpen] = useState(false);
-
-  const [passOpen, setPassOpen] = useState(false);
-  const [passDraft, setPassDraft] = useState({ newPass: "", confirmPass: "" });
-
-  function savePass() {
-    if (!passDraft.newPass.trim()) {
-      toast("Vui lòng nhập mật khẩu mới");
-      return;
-    }
-    if (passDraft.newPass !== passDraft.confirmPass) {
-      toast("Mật khẩu xác nhận không khớp");
-      return;
-    }
-    update((d) => ({ ...d, adminPassword: passDraft.newPass.trim() }));
-    setPassOpen(false);
-    setPassDraft({ newPass: "", confirmPass: "" });
-    toast("Đã cập nhật mật khẩu Admin mới!");
-  }
 
   const [fieldsHeaderOpen, setFieldsHeaderOpen] = useState(false);
   const [fieldsHeaderDraft, setFieldsHeaderDraft] = useState({
@@ -543,16 +524,16 @@ export default function AboutAdmin() {
             <AdminButton variant="ghost" onClick={openFieldsHeader}>
               <Pencil size={15} /> Sửa tiêu đề phần
             </AdminButton>
-            <AddButton onClick={openNewField} />
+            <AddButton onClick={openNewField}>Thêm lĩnh vực</AddButton>
           </div>
         }
       >
         <div className="border-b border-black/5 bg-slate-50/70 px-6 py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#697086]">Tiêu đề phần:</span>
-              <h4 className="font-bold text-adminink text-base mt-0.5">{data.fieldsTitle || "Lĩnh vực hoạt động"}</h4>
-              <p className="text-xs text-[#5f6472] mt-0.5 max-w-[650px]">{data.fieldsSubtitle || "Những bài toán vận hành..."}</p>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#697086]">Tiêu đề phần ở trang chủ:</span>
+              <h4 className="mt-0.5 text-base font-bold text-adminink">{data.fieldsTitle || "Lĩnh vực hoạt động"}</h4>
+              <p className="mt-0.5 max-w-[650px] text-xs text-[#5f6472]">{data.fieldsSubtitle || "Những bài toán vận hành mà tôi đã đồng hành cùng doanh nghiệp giải quyết bằng phần mềm."}</p>
             </div>
           </div>
         </div>
@@ -563,8 +544,8 @@ export default function AboutAdmin() {
               <Td><Badge tone={f.visible ? "ok" : "read"}>{f.visible ? "Hiển thị" : "Ẩn"}</Badge></Td>
               <Td>
                 <div className="flex justify-end gap-2">
-                  <IconAction onClick={() => openEditField(i)}><Pencil size={16} /></IconAction>
-                  <IconAction tone="danger" onClick={() => setConfirmField(i)}><Trash2 size={16} /></IconAction>
+                  <IconAction onClick={() => openEditField(i)} title="Chỉnh sửa"><Pencil size={16} /></IconAction>
+                  <IconAction tone="danger" onClick={() => setConfirmField(i)} title="Xóa"><Trash2 size={16} /></IconAction>
                 </div>
               </Td>
             </tr>
@@ -587,13 +568,13 @@ export default function AboutAdmin() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-[#697086]">Tiêu đề phần ở trang chủ:</span>
-              <h4 className="font-bold text-adminink text-base mt-0.5">{data.projectsTitle || "Dự án tiêu biểu"}</h4>
-              <p className="text-xs text-[#5f6472] mt-0.5 max-w-[650px]">{data.projectsSubtitle || "Các sản phẩm & hệ thống thực tế..."}</p>
+              <h4 className="mt-0.5 text-base font-bold text-adminink">{data.projectsTitle || "Dự án tiêu biểu"}</h4>
+              <p className="mt-0.5 max-w-[650px] text-xs text-[#5f6472]">{data.projectsSubtitle || "Các sản phẩm & hệ thống thực tế tôi đã tham gia phân tích, thiết kế và triển khai cho doanh nghiệp."}</p>
             </div>
           </div>
         </div>
 
-        <div className="px-6 py-3.5 bg-blue-50/60 border-b border-black/5 flex flex-wrap items-center justify-between gap-2 text-xs text-[#5f6472]">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-black/5 bg-blue-50/60 px-6 py-3.5 text-xs text-[#5f6472]">
           <span>Danh sách bên dưới là các dự án đang được chọn hiển thị trên slider thanh cuộn ở trang chủ.</span>
           <span className="font-bold text-brand">
             Đang hiển thị: {data.projects.filter((p) => p.featured).length} / {data.projects.length} dự án
@@ -615,8 +596,8 @@ export default function AboutAdmin() {
                       )}
                     </span>
                     <div>
-                      <div className="font-bold text-adminink text-sm">{p.title}</div>
-                      <div className="text-xs text-[#697086] line-clamp-1">{p.summary}</div>
+                      <div className="text-sm font-bold text-adminink">{p.title}</div>
+                      <div className="line-clamp-1 text-xs text-[#697086]">{p.summary}</div>
                     </div>
                   </div>
                 </Td>
@@ -626,7 +607,7 @@ export default function AboutAdmin() {
                   <AdminButton
                     variant="ghost"
                     onClick={() => toggleProjectFeatured(p.slug, false)}
-                    className="!py-1 !px-3 text-xs font-semibold text-rose-600 hover:bg-rose-50 border-rose-200"
+                    className="border-rose-200 !px-3 !py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50"
                   >
                     Gỡ khỏi tiêu biểu
                   </AdminButton>
@@ -659,17 +640,17 @@ export default function AboutAdmin() {
         <div className="border-b border-black/5 bg-slate-50/70 px-6 py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#697086]">Tiêu đề phần:</span>
-              <h4 className="font-bold text-adminink text-base mt-0.5">{data.processTitle || "Quy trình Hợp tác"}</h4>
-              <p className="text-xs text-[#5f6472] mt-0.5 max-w-[650px]">{data.processSubtitle || "Chúng tôi áp dụng mô hình vận hành chuyên nghiệp..."}</p>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#697086]">Tiêu đề phần ở trang chủ:</span>
+              <h4 className="mt-0.5 text-base font-bold text-adminink">{data.processTitle || "Quy trình Hợp tác"}</h4>
+              <p className="mt-0.5 max-w-[650px] text-xs text-[#5f6472]">{data.processSubtitle || "Chúng tôi áp dụng mô hình vận hành chuyên nghiệp, đảm bảo tính minh bạch và hiệu quả cao nhất cho mọi sản phẩm công nghệ."}</p>
             </div>
           </div>
         </div>
-        <div className="px-6 py-2.5 bg-blue-50/60 border-b border-black/5 flex items-center justify-between text-xs text-[#5f6472]">
-          <span>Mẹo: Bạn có thể nhấn giữ biểu tượng <GripVertical size={14} className="inline mx-0.5 text-slate-500" /> kéo thả hoặc dùng nút mũi tên để thay đổi thứ tự các bước.</span>
+        <div className="flex items-center justify-between border-b border-black/5 bg-blue-50/60 px-6 py-2.5 text-xs text-[#5f6472]">
+          <span>Mẹo: Bạn có thể nhấn giữ biểu tượng <GripVertical size={14} className="mx-0.5 inline text-slate-500" /> ở cột Hành động và kéo thả để thay đổi thứ tự các bước.</span>
           <span className="font-bold text-brand">{data.process.length} bước</span>
         </div>
-        <Table head={<tr><Th className="w-10 text-center"></Th><Th className="w-16">Icon / Ảnh</Th><Th>Bước / Tên công việc</Th><Th>Mô tả chi tiết</Th><Th className="text-right">Hành động</Th></tr>}>
+        <Table head={<tr><Th className="whitespace-nowrap">Icon / Ảnh</Th><Th>Bước / Tên công việc</Th><Th>Mô tả chi tiết</Th><Th className="text-right">Hành động</Th></tr>}>
           {data.process.map((step, i) => (
             <tr
               key={step.title + i}
@@ -687,15 +668,10 @@ export default function AboutAdmin() {
                 }
                 setDraggedProcessIndex(null);
               }}
-              className={`hover:bg-[#fcfbfd] transition ${draggedProcessIndex === i ? "opacity-40 bg-blue-50/50" : ""}`}
+              className={`hover:bg-[#fcfbfd] transition ${draggedProcessIndex === i ? "bg-blue-50/50 opacity-40" : ""}`}
             >
-              <Td className="w-10 text-center">
-                <div className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-adminink inline-flex items-center justify-center p-1" title="Kéo thả để sắp xếp">
-                  <GripVertical size={18} />
-                </div>
-              </Td>
-              <Td className="w-16">
-                <div className="h-10 w-10 flex-none overflow-hidden rounded-xl border border-black/10 bg-slate-50 flex items-center justify-center">
+              <Td className="whitespace-nowrap">
+                <div className="flex h-10 w-10 flex-none items-center justify-center overflow-hidden rounded-xl border border-black/10 bg-slate-50">
                   {step.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={step.image} alt="" className="h-full w-full object-cover" />
@@ -704,23 +680,23 @@ export default function AboutAdmin() {
                   )}
                 </div>
               </Td>
-              <Td className="font-bold text-adminink max-w-[200px]">
+              <Td className="max-w-[200px] font-bold text-adminink">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-brand bg-brand/10 px-2 py-0.5 rounded-full">#{i + 1}</span>
+                  <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-semibold text-brand">#{i + 1}</span>
                   <span>{step.title}</span>
                 </div>
               </Td>
-              <Td className="text-xs text-[#5f6472] max-w-[380px]">{step.body}</Td>
+              <Td className="max-w-[380px] text-xs text-[#5f6472]">{step.body}</Td>
               <Td>
                 <div className="flex items-center justify-end gap-1.5">
-                  <IconAction onClick={() => moveProcess(i, i - 1)} disabled={i === 0} title="Di chuyển lên">
-                    <ArrowUp size={15} />
-                  </IconAction>
-                  <IconAction onClick={() => moveProcess(i, i + 1)} disabled={i === data.process.length - 1} title="Di chuyển xuống">
-                    <ArrowDown size={15} />
-                  </IconAction>
                   <IconAction onClick={() => openEditProcess(i)} title="Chỉnh sửa"><Pencil size={16} /></IconAction>
                   <IconAction tone="danger" onClick={() => setConfirmProcess(i)} title="Xóa"><Trash2 size={16} /></IconAction>
+                  <div
+                    className="grid h-[34px] w-[34px] cursor-grab active:cursor-grabbing place-items-center rounded-[9px] border border-[#e2e8f0] bg-white text-slate-400 transition hover:border-brand hover:text-adminink"
+                    title="Nhấn giữ và kéo thả để sắp xếp thứ tự"
+                  >
+                    <GripVertical size={16} />
+                  </div>
                 </div>
               </Td>
             </tr>
@@ -729,34 +705,6 @@ export default function AboutAdmin() {
       </Panel>
 
 
-
-      <Panel
-        eyebrow="Bảo mật tài khoản Admin"
-        action={
-          <AdminButton variant="ghost" onClick={() => setPassOpen(true)}>
-            <Pencil size={15} /> Đổi mật khẩu Admin
-          </AdminButton>
-        }
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-5">
-          <div>
-            <p className="text-sm font-bold text-adminink">Mật khẩu truy cập Admin</p>
-            <p className="mt-0.5 text-[13px] text-[#697086]">
-              {data.adminPassword ? "Bạn đã cài đặt mật khẩu tùy chỉnh riêng." : "Đang sử dụng mật khẩu hệ thống mặc định."}
-            </p>
-          </div>
-          <AdminButton variant="ghost" onClick={() => setPassOpen(true)}>
-            <Pencil size={15} /> Đổi mật khẩu
-          </AdminButton>
-        </div>
-      </Panel>
-
-      <Panel eyebrow="Khôi phục">
-        <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-5">
-          <p className="text-[13px] text-[#697086]">Xóa mọi chỉnh sửa đã lưu và đưa nội dung về mặc định ban đầu.</p>
-          <AdminButton variant="ghost" onClick={() => setResetOpen(true)}><RotateCcw size={16} /> Khôi phục mặc định</AdminButton>
-        </div>
-      </Panel>
 
       {/* edit info modal */}
       <Modal
@@ -1118,44 +1066,6 @@ export default function AboutAdmin() {
       </Modal>
 
       <ConfirmDialog open={confirmField !== null} label={confirmField !== null ? data.fields[confirmField]?.name ?? "" : ""} onCancel={() => setConfirmField(null)} onConfirm={removeField} />
-
-      {/* change password modal */}
-      <Modal
-        open={passOpen}
-        onClose={() => setPassOpen(false)}
-        title="Đổi mật khẩu truy cập Admin CMS"
-        footer={
-          <>
-            <AdminButton variant="ghost" onClick={() => setPassOpen(false)}>Hủy</AdminButton>
-            <AdminButton onClick={savePass}>Lưu mật khẩu mới</AdminButton>
-          </>
-        }
-      >
-        <div className="flex flex-col gap-4">
-          <Field label="Mật khẩu mới">
-            <Input
-              type="password"
-              value={passDraft.newPass}
-              onChange={(e) => setPassDraft({ ...passDraft, newPass: e.target.value })}
-              placeholder="Nhập mật khẩu mới..."
-            />
-          </Field>
-          <Field label="Xác nhận mật khẩu mới">
-            <Input
-              type="password"
-              value={passDraft.confirmPass}
-              onChange={(e) => setPassDraft({ ...passDraft, confirmPass: e.target.value })}
-              placeholder="Nhập lại mật khẩu mới..."
-            />
-          </Field>
-        </div>
-      </Modal>
-
-      {/* reset confirm */}
-      <Modal open={resetOpen} onClose={() => setResetOpen(false)} title="Khôi phục nội dung gốc"
-        footer={<><AdminButton variant="ghost" onClick={() => setResetOpen(false)}>Hủy</AdminButton><AdminButton variant="danger" onClick={() => { reset(); setResetOpen(false); toast("Đã khôi phục nội dung gốc"); }}>Khôi phục</AdminButton></>}>
-        <p className="text-[15px] text-[#697086]">Toàn bộ chỉnh sửa (văn bản, ảnh) sẽ bị xóa và nội dung trở về mặc định. Hành động này không thể hoàn tác.</p>
-      </Modal>
     </div>
   );
 }

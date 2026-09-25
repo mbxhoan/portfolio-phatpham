@@ -60,8 +60,6 @@ export function FeaturedProjects() {
     }
   };
 
-  if (total === 0) return null;
-
   // Triplicated array for smooth infinite continuous loop
   const displayList = total > 1 ? [...displayProjectsList, ...displayProjectsList, ...displayProjectsList] : displayProjectsList;
 
@@ -73,29 +71,53 @@ export function FeaturedProjects() {
           subtitle={data.projectsSubtitle ?? "Các sản phẩm & hệ thống thực tế tôi đã tham gia phân tích, thiết kế và triển khai cho doanh nghiệp."}
         />
 
-        {/* Carousel Viewport */}
-        <div
-          className="overflow-hidden py-3"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <div
-            onTransitionEnd={handleTransitionEnd}
-            className={`flex gap-6 ${isTransitioning ? "transition-transform duration-500 ease-in-out" : "transition-none"}`}
-            style={{
-              transform: `translateX(calc(-${currentIndex} * (100% + 24px) / 3))`,
-            }}
-          >
-            {displayList.map((p, i) => (
+        {total === 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 py-3">
+            {[1, 2, 3].map((idx) => (
               <div
-                key={`${p.slug}-${i}`}
-                className="w-full sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] flex-none"
+                key={idx}
+                className="flex flex-col gap-4 rounded-3xl bg-white/70 p-7 border-2 border-dashed border-slate-200/80 shadow-sm"
               >
-                <ProjectCard project={p} showTag />
+                <div className="flex items-center justify-between">
+                  <span className="grid h-12 w-12 place-items-center rounded-xl bg-blue-50 font-bold text-blue-600 text-sm border border-blue-100">
+                    PRJ
+                  </span>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                    Dự án
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-700">Dự án tiêu biểu {idx}</h3>
+                <p className="text-[14px] leading-relaxed text-slate-500">
+                  Chưa có dự án nào. Bạn có thể thêm và quản lý dự án trong bảng điều khiển Admin CMS.
+                </p>
               </div>
             ))}
           </div>
-        </div>
+        ) : (
+          /* Carousel Viewport */
+          <div
+            className="overflow-hidden py-3"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <div
+              onTransitionEnd={handleTransitionEnd}
+              className={`flex gap-6 ${isTransitioning ? "transition-transform duration-500 ease-in-out" : "transition-none"}`}
+              style={{
+                transform: `translateX(calc(-${currentIndex} * (100% + 24px) / 3))`,
+              }}
+            >
+              {displayList.map((p, i) => (
+                <div
+                  key={`${p.slug}-${i}`}
+                  className="w-full sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] flex-none"
+                >
+                  <ProjectCard project={p} showTag />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Bottom Control Bar: Left Arrow + Dots Indicator + Right Arrow */}
         {total > 1 && (

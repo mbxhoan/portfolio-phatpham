@@ -12,6 +12,7 @@ export const siteConfig = {
 };
 
 export const nav = [
+  { label: "Trang chủ", href: "/" },
   { label: "Năng lực cá nhân", href: "/nang-luc" },
   { label: "Dự án", href: "/du-an" },
   { label: "Liên hệ", href: "/lien-he" },

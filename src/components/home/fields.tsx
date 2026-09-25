@@ -60,8 +60,6 @@ export function Fields() {
     }
   };
 
-  if (fields.length === 0) return null;
-
   // Render triplicated list for smooth continuous infinite loop
   const displayFields = total > 1 ? [...fields, ...fields, ...fields] : fields;
 
@@ -73,35 +71,54 @@ export function Fields() {
           subtitle={data.fieldsSubtitle ?? "Những bài toán vận hành mà tôi đã đồng hành cùng doanh nghiệp giải quyết bằng phần mềm."}
         />
 
-        {/* Carousel Viewport */}
-        <div
-          className="overflow-hidden py-3"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <div
-            onTransitionEnd={handleTransitionEnd}
-            className={`flex gap-6 ${isTransitioning ? "transition-transform duration-500 ease-in-out" : "transition-none"}`}
-            style={{
-              transform: `translateX(calc(-${currentIndex} * (100% + 24px) / 3))`,
-            }}
-          >
-            {displayFields.map((f, i) => (
+        {fields.length === 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 py-3">
+            {[1, 2, 3].map((idx) => (
               <div
-                key={`${f.name}-${i}`}
-                className="w-full sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] flex-none"
+                key={idx}
+                className="flex flex-col gap-4 rounded-3xl bg-white/70 p-8 border-2 border-dashed border-slate-200/80 shadow-sm"
               >
-                <div className="group flex h-full flex-col gap-4 rounded-3xl bg-white p-8 sm:p-10 border border-transparent shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-200 hover:shadow-[0_20px_45px_-12px_rgba(37,99,235,0.18)]">
-                  <div className="grid h-16 w-16 flex-none place-items-center rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 border border-blue-100/80 group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm">
-                    <Icon name={f.icon} className="h-7 w-7" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-200">{f.name}</h3>
-                  <p className="text-[15px] leading-relaxed text-slate-600">{f.body}</p>
+                <div className="grid h-16 w-16 place-items-center rounded-2xl bg-blue-50 text-blue-500 border border-blue-100">
+                  <Icon name="boxes" className="h-7 w-7" />
                 </div>
+                <h3 className="text-xl font-bold text-slate-700">Lĩnh vực hoạt động {idx}</h3>
+                <p className="text-[14px] leading-relaxed text-slate-500">
+                  Chưa có nội dung. Bạn có thể thêm các lĩnh vực hoạt động trong bảng điều khiển Admin CMS.
+                </p>
               </div>
             ))}
           </div>
-        </div>
+        ) : (
+          /* Carousel Viewport */
+          <div
+            className="overflow-hidden py-3"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <div
+              onTransitionEnd={handleTransitionEnd}
+              className={`flex gap-6 ${isTransitioning ? "transition-transform duration-500 ease-in-out" : "transition-none"}`}
+              style={{
+                transform: `translateX(calc(-${currentIndex} * (100% + 24px) / 3))`,
+              }}
+            >
+              {displayFields.map((f, i) => (
+                <div
+                  key={`${f.name}-${i}`}
+                  className="w-full sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] flex-none"
+                >
+                  <div className="group flex h-full flex-col gap-4 rounded-3xl bg-white p-8 sm:p-10 border border-transparent shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-200 hover:shadow-[0_20px_45px_-12px_rgba(37,99,235,0.18)]">
+                    <div className="grid h-16 w-16 flex-none place-items-center rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 border border-blue-100/80 group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm">
+                      <Icon name={f.icon} className="h-7 w-7" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-200">{f.name}</h3>
+                    <p className="text-[15px] leading-relaxed text-slate-600">{f.body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Bottom Control Bar: Left Arrow + Dots Indicator + Right Arrow */}
         {total > 1 && (

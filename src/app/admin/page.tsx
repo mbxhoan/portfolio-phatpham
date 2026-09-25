@@ -1,17 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Eye } from "lucide-react";
 import { PageHead, Panel, Badge, Table, Th, Td, IconAction, Modal, AdminButton } from "@/components/admin/ui";
 import { Icon } from "@/lib/icon-map";
 import { usePortfolio } from "@/lib/store";
-import type { Message } from "@/types/portfolio";
+import type { Message, IconName } from "@/types/portfolio";
 
 export default function OverviewPage() {
   const { data, update } = usePortfolio();
   const messages = data.messages;
   const [active, setActive] = useState<Message | null>(null);
+
+  const [viewsCount, setViewsCount] = useState(0);
+  const [interactionsCount, setInteractionsCount] = useState(0);
+
+  useEffect(() => {
+    const updateRealCounts = () => {
+      try {
+        // Reset legacy high numbers in browser storage to 0
+        if (!localStorage.getItem("phat_stats_reset_zero")) {
+          localStorage.setItem("phat_profile_views", "1");
+          localStorage.setItem("phat_profile_interactions", "0");
+          localStorage.setItem("phat_stats_reset_zero", "true");
+        }
+
+        const v = localStorage.getItem("phat_profile_views");
+        setViewsCount(v ? parseInt(v, 10) : 0);
+
+        const i = localStorage.getItem("phat_profile_interactions");
+        setInteractionsCount(i ? parseInt(i, 10) : 0);
+      } catch {}
+    };
+
+    updateRealCounts();
+    const interval = setInterval(updateRealCounts, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  const totalMessages = messages.length;
+  const unreadMessages = messages.filter((m) => m.status === "new").length;
+
+  const stats: { label: string; value: string; sub: string; icon: IconName }[] = [
+    {
+      label: "Lượt xem hồ sơ",
+      value: viewsCount.toLocaleString("vi-VN"),
+      sub: "Lượt ghé thăm thực tế",
+      icon: "eye",
+    },
+    {
+      label: "Tin nhắn",
+      value: `${totalMessages}`,
+      sub: `${unreadMessages} Chưa đọc · cần phản hồi`,
+      icon: "messageSquare",
+    },
+    {
+      label: "Lượt tương tác",
+      value: interactionsCount.toLocaleString("vi-VN"),
+      sub: `${data.projects.length} dự án · ${data.fields.length} lĩnh vực`,
+      icon: "trendingUp",
+    },
+  ];
 
   function open(m: Message) {
     update((d) => ({ ...d, messages: d.messages.map((x) => (x.id === m.id ? { ...x, status: "read" } : x)) }));
@@ -23,7 +73,7 @@ export default function OverviewPage() {
       <PageHead title="Chào buổi sáng, Phát" subtitle="Dưới đây là thông tin cập nhật cho hệ thống của bạn hôm nay." />
 
       <div className="mb-7 grid gap-5 md:grid-cols-3">
-        {data.stats.map((s) => (
+        {stats.map((s) => (
           <div key={s.label} className="rounded-2xl border border-black/5 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,.04)]">
             <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-soft-2 text-brand">
               <Icon name={s.icon} className="h-[22px] w-[22px]" />

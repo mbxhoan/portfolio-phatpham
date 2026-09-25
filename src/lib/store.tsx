@@ -20,7 +20,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import basePortfolio from "@/data/portfolio";
+import basePortfolio, { emptySkeleton } from "@/data/portfolio";
 import { fetchPortfolio, savePortfolio } from "@/lib/api";
 import type { Portfolio } from "@/types/portfolio";
 
@@ -70,7 +70,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
             if (local) {
               setData(mergeBase(JSON.parse(local)));
             }
-          } catch {}
+          } catch { }
         }
       })
       .catch(() => {
@@ -80,7 +80,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
           if (local) {
             setData(mergeBase(JSON.parse(local)));
           }
-        } catch {}
+        } catch { }
       })
       .finally(() => {
         if (alive) setReady(true);
@@ -91,7 +91,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
         if (e.newValue) {
           try {
             setData(mergeBase(JSON.parse(e.newValue)));
-          } catch {}
+          } catch { }
         } else {
           setData(basePortfolio);
         }
@@ -105,13 +105,55 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Session view counter (+1 per browser session) & global interaction click tracker (+1 per click)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Reset legacy numbers in browser storage to 0 once
+    try {
+      if (!localStorage.getItem("phat_stats_reset_zero")) {
+        localStorage.setItem("phat_profile_views", "1");
+        localStorage.setItem("phat_profile_interactions", "0");
+        localStorage.setItem("phat_stats_reset_zero", "true");
+      }
+    } catch {}
+
+    // 1. Session tracking for Profile views (+1 per browser session)
+    try {
+      const hasSession = sessionStorage.getItem("phat_session_active");
+      if (!hasSession) {
+        sessionStorage.setItem("phat_session_active", "true");
+        const views = parseInt(localStorage.getItem("phat_profile_views") || "0", 10);
+        localStorage.setItem("phat_profile_views", (views + 1).toString());
+      }
+    } catch {}
+
+    // 2. Interaction tracking (+1 per button/link/menu/interactive click)
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const isInteractive = target.closest("button, a, input[type='button'], input[type='submit'], [role='button']");
+      if (isInteractive) {
+        try {
+          const currentInteractions = parseInt(localStorage.getItem("phat_profile_interactions") || "0", 10);
+          localStorage.setItem("phat_profile_interactions", (currentInteractions + 1).toString());
+        } catch {}
+      }
+    };
+
+    document.addEventListener("click", handleGlobalClick, { capture: true });
+    return () => {
+      document.removeEventListener("click", handleGlobalClick, { capture: true });
+    };
+  }, []);
+
   // Debounced persist to the server & instant persist to localStorage
   useEffect(() => {
     if (!ready || !dirty.current) return;
 
     try {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-    } catch {}
+    } catch { }
 
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
@@ -132,9 +174,11 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const reset = useCallback(() => {
     dirty.current = true;
     try {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-    } catch {}
-    setData(basePortfolio);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(emptySkeleton));
+      localStorage.setItem("phat_profile_views", "0");
+      localStorage.setItem("phat_profile_interactions", "0");
+    } catch { }
+    setData(emptySkeleton);
   }, []);
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { nav } from "@/lib/site";
@@ -8,6 +9,7 @@ import { usePortfolio } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
+  const pathname = usePathname();
   const { data } = usePortfolio();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -43,16 +45,27 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-7 md:flex">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="group relative py-1.5 text-[14.5px] font-medium text-body transition-colors hover:text-navy"
-            >
-              {item.label}
-              <span className="absolute inset-x-0 bottom-0 h-0.5 w-0 bg-brand transition-all duration-300 group-hover:w-full" />
-            </Link>
-          ))}
+          {nav.map((item) => {
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "group relative py-1.5 text-[14.5px] font-medium transition-colors",
+                  active ? "font-bold text-navy" : "text-body hover:text-navy"
+                )}
+              >
+                {item.label}
+                <span
+                  className={cn(
+                    "absolute inset-x-0 bottom-0 h-0.5 bg-brand transition-all duration-300",
+                    active ? "w-full" : "w-0 group-hover:w-full"
+                  )}
+                />
+              </Link>
+            );
+          })}
           <Link
             href="/admin"
             className="inline-flex h-9 items-center rounded-[11px] bg-gradient-to-b from-navy to-navy-2 px-5 text-sm font-semibold text-white shadow-[0_8px_18px_-6px_rgba(0,11,96,.55)] transition-transform hover:-translate-y-0.5"
@@ -72,16 +85,22 @@ export function Navbar() {
 
       {open && (
         <div className="absolute inset-x-0 top-[72px] flex flex-col gap-1 border-t border-white/60 bg-[rgba(250,248,255,0.98)] p-4 shadow-xl backdrop-blur-2xl md:hidden">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setOpen(false)}
-              className="rounded-xl px-4 py-3 font-medium text-body hover:bg-white"
-            >
-              {item.label}
-            </Link>
-          ))}
+          {nav.map((item) => {
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  "rounded-xl px-4 py-3 font-medium transition-colors",
+                  active ? "bg-white font-bold text-navy shadow-sm" : "text-body hover:bg-white"
+                )}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
           <Link
             href="/admin"
             onClick={() => setOpen(false)}

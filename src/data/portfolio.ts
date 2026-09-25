@@ -172,4 +172,59 @@ export const portfolio: Portfolio = {
   },
 };
 
+export const emptySkeleton: Portfolio = {
+  person: {
+    name: "Tên của bạn",
+    role: "Chức danh / Vị trí",
+    initials: "P",
+    tagline: "Vui lòng cập nhật thông tin giới thiệu bản thân...",
+    email: "email@example.com",
+    address: "Địa chỉ của bạn",
+    yearsBadge: { value: "0 năm", label: "Kinh nghiệm" },
+    quickLinks: {
+      capability: { visible: true, label: "Năng lực chuyên môn", color: "#004AC6" },
+      projects: { visible: true, label: "Dự án thực hiện", color: "#000B60" },
+      contact: { visible: true, label: "Liên hệ ngay", color: "#475569" },
+    },
+  },
+
+  fieldsTitle: "Lĩnh vực hoạt động",
+  fieldsSubtitle: "Vui lòng thêm các lĩnh vực hoạt động tại trang quản trị.",
+  fields: [],
+
+  capabilities: [],
+  tools: [],
+
+  processTitle: "Quy trình Hợp tác",
+  processSubtitle: "Vui lòng thêm quy trình hợp tác tại trang quản trị.",
+  process: [],
+
+  categories: ["Tất cả"],
+
+  projectsTitle: "Dự án tiêu biểu",
+  projectsSubtitle: "Vui lòng thêm các dự án tại trang quản trị.",
+  projects: [],
+
+  socials: [
+    { label: "Facebook", href: "#", icon: "messageSquare" },
+    { label: "Zalo", href: "#", icon: "messageSquare" },
+    { label: "YouTube", href: "#", icon: "messageSquare" },
+    { label: "Mail", href: "mailto:email@example.com", icon: "fileText" },
+  ],
+
+  messages: [],
+
+  stats: [
+    { label: "Lượt xem hồ sơ", value: "0", sub: "0% so với tuần trước", icon: "eye" },
+    { label: "Tin nhắn", value: "0", sub: "0 Chưa đọc · cần phản hồi", icon: "messageSquare" },
+    { label: "Lượt tương tác", value: "0", sub: "0% KPI · hiệu suất tổng thể", icon: "trendingUp" },
+  ],
+  footerSocials: {
+    facebook: { visible: true, url: "#" },
+    instagram: { visible: true, url: "#" },
+    youtube: { visible: true, url: "#" },
+  },
+};
+
 export default portfolio;
+
