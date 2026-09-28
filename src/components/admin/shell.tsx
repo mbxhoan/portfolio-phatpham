@@ -181,9 +181,9 @@ function AdminShellContent({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="mt-auto px-6 pb-5 text-xs text-[#94a0b0]">
-          SECRECT TEAM
+          SECRET TEAM
           <br />
-          Powered by SECRECT TEAM
+          Powered by SECRET TEAM
         </div>
       </aside>
 

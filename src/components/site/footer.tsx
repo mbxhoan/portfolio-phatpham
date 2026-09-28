@@ -11,9 +11,9 @@ export function Footer() {
     <footer className="border-t border-[#e2e8f0]/60 bg-[rgba(228,225,235,0.53)]">
       <div className="container-x flex flex-wrap items-center justify-between gap-6 py-9">
         <div>
-          <p className="text-sm font-bold tracking-[0.04em] text-[#0F172A]">SECRECT TEAM</p>
+          <p className="text-sm font-bold tracking-[0.04em] text-[#0F172A]">SECRET TEAM</p>
           <p className="mt-1 text-xs tracking-[0.02em] text-[#64748B]">
-            Powered by SECRECT TEAM · © {new Date().getFullYear()} {data.person.name}
+            Powered by SECRET TEAM · © {new Date().getFullYear()} {data.person.name}
           </p>
         </div>
         <div className="flex flex-wrap gap-2.5">

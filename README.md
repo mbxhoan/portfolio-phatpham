@@ -67,4 +67,4 @@ For the editable CMS (image uploads + cross-device content) you need a Blob stor
 
 ---
 
-© Phạm Minh Phát · Powered by SECRECT TEAM
+© Phạm Minh Phát · Powered by SECRET TEAM
