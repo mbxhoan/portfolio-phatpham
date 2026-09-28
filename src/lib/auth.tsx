@@ -18,9 +18,8 @@ import {
 } from "react";
 import { apiLogin, apiLogout, apiSession } from "@/lib/api";
 
-// Cosmetic — accepted identities for the login form. The real gate is the
-// server-side password check.
 const VALID_IDENTITIES = ["admin", "admin@example.vn"];
+const TOKEN_KEY = "phat_admin_token";
 
 interface AuthContextValue {
   authed: boolean;
@@ -32,18 +31,36 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [authed, setAuthed] = useState(false);
+  // Synchronously initialize authed state from localStorage if available
+  const [authed, setAuthed] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return Boolean(localStorage.getItem(TOKEN_KEY));
+    } catch {
+      return false;
+    }
+  });
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let alive = true;
+    const hasLocalToken = typeof window !== "undefined" && Boolean(localStorage.getItem(TOKEN_KEY));
+
+    if (hasLocalToken) {
+      setAuthed(true);
+    }
+
     apiSession()
       .then((ok) => {
         if (alive) setAuthed(ok);
       })
+      .catch(() => {
+        if (alive && !hasLocalToken) setAuthed(false);
+      })
       .finally(() => {
         if (alive) setReady(true);
       });
+
     return () => {
       alive = false;
     };

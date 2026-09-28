@@ -14,7 +14,9 @@ export const dynamic = "force-dynamic";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 export async function GET(req: NextRequest) {
-  const authed = isValidSession(req.cookies.get(SESSION_COOKIE)?.value);
+  const cookieVal = req.cookies.get(SESSION_COOKIE)?.value;
+  const headerVal = req.headers.get("authorization");
+  const authed = isValidSession(cookieVal) || isValidSession(headerVal);
   return NextResponse.json(
     { authed },
     {
@@ -40,8 +42,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
-  const res = NextResponse.json({ ok: true });
-  res.cookies.set(SESSION_COOKIE, sessionToken(), {
+  const token = sessionToken();
+  const res = NextResponse.json({ ok: true, token });
+  res.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

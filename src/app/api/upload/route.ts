@@ -14,7 +14,9 @@ export const dynamic = "force-dynamic";
 const MAX_BYTES = 4 * 1024 * 1024; // 4 MB — compressed images are far smaller
 
 export async function POST(req: NextRequest) {
-  if (!isValidSession(req.cookies.get(SESSION_COOKIE)?.value)) {
+  const cookieVal = req.cookies.get(SESSION_COOKIE)?.value;
+  const headerVal = req.headers.get("authorization");
+  if (!isValidSession(cookieVal) && !isValidSession(headerVal)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 

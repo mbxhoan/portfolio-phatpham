@@ -9,8 +9,8 @@ function Gate({ children }: { children: ReactNode }) {
   const { authed, ready } = useAuth();
   if (!ready) {
     return (
-      <div className="grid min-h-screen place-items-center bg-adminbg text-sm text-[#94a0b0]">
-        Đang tải…
+      <div className="grid min-h-screen place-items-center bg-adminbg text-sm font-semibold text-[#697086]">
+        Đang xác thực quyền truy cập…
       </div>
     );
   }

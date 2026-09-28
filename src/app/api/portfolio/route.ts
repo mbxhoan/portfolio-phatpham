@@ -18,7 +18,9 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
-  if (!isValidSession(req.cookies.get(SESSION_COOKIE)?.value)) {
+  const cookieVal = req.cookies.get(SESSION_COOKIE)?.value;
+  const headerVal = req.headers.get("authorization");
+  if (!isValidSession(cookieVal) && !isValidSession(headerVal)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 

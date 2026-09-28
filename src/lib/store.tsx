@@ -62,7 +62,11 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       .then((saved) => {
         if (!alive) return;
         if (saved) {
-          setData(mergeBase(saved));
+          const merged = mergeBase(saved);
+          setData(merged);
+          try {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(merged));
+          } catch {}
         } else {
           // Fallback to localStorage if server Blob is not configured
           try {

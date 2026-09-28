@@ -51,11 +51,26 @@ export function checkPassword(password: string, customPass?: string): boolean {
   return false;
 }
 
-/** True if a request cookie value is a valid session token. */
-export function isValidSession(cookieValue: string | undefined): boolean {
-  if (!cookieValue) return false;
-  const token = sessionToken();
-  const a = new Uint8Array(Buffer.from(cookieValue));
-  const b = new Uint8Array(Buffer.from(token));
+/** Extract session token from cookie value or Authorization header string. */
+export function extractToken(input: string | undefined | null): string | null {
+  if (!input) return null;
+  let raw = input.trim();
+  if (raw.toLowerCase().startsWith("bearer ")) {
+    raw = raw.substring(7).trim();
+  }
+  try {
+    raw = decodeURIComponent(raw);
+  } catch {}
+  raw = raw.replace(/^"|"$/g, "").trim();
+  return raw || null;
+}
+
+/** True if a request cookie value or Authorization header is a valid session token. */
+export function isValidSession(tokenInput: string | undefined | null): boolean {
+  const token = extractToken(tokenInput);
+  if (!token) return false;
+  const expected = sessionToken();
+  const a = new Uint8Array(Buffer.from(token));
+  const b = new Uint8Array(Buffer.from(expected));
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
