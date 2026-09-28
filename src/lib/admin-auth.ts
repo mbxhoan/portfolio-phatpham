@@ -19,22 +19,36 @@ export function adminPassword(): string {
   return process.env.ADMIN_PASSWORD || "12345678";
 }
 
-/** Deterministic, unguessable token derived from the password. */
-export function sessionToken(customPass?: string): string {
-  const target = customPass || adminPassword();
+/** Deterministic, unguessable token derived from the admin password environment/key. */
+export function sessionToken(): string {
   return crypto
     .createHash("sha256")
-    .update(`phat-portfolio-session:${target}`)
+    .update(`phat-portfolio-session:${adminPassword()}`)
     .digest("hex");
 }
 
-/** True if the supplied password matches the configured or custom admin password. */
+/** True if the supplied password matches the configured environment password or custom admin password. */
 export function checkPassword(password: string, customPass?: string): boolean {
   if (!password) return false;
-  const target = customPass || adminPassword();
-  const a = new Uint8Array(Buffer.from(password));
-  const b = new Uint8Array(Buffer.from(target));
-  return a.length === b.length && crypto.timingSafeEqual(a, b);
+  const passBuf = Buffer.from(password);
+
+  const envPass = adminPassword();
+  const envBuf = Buffer.from(envPass);
+  const matchEnv =
+    passBuf.length === envBuf.length &&
+    crypto.timingSafeEqual(new Uint8Array(passBuf), new Uint8Array(envBuf));
+
+  if (matchEnv) return true;
+
+  if (customPass) {
+    const customBuf = Buffer.from(customPass);
+    const matchCustom =
+      passBuf.length === customBuf.length &&
+      crypto.timingSafeEqual(new Uint8Array(passBuf), new Uint8Array(customBuf));
+    if (matchCustom) return true;
+  }
+
+  return false;
 }
 
 /** True if a request cookie value is a valid session token. */

@@ -15,7 +15,14 @@ const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 export async function GET(req: NextRequest) {
   const authed = isValidSession(req.cookies.get(SESSION_COOKIE)?.value);
-  return NextResponse.json({ authed });
+  return NextResponse.json(
+    { authed },
+    {
+      headers: {
+        "Cache-Control": "no-store, max-age=0, must-revalidate",
+      },
+    }
+  );
 }
 
 export async function POST(req: NextRequest) {
@@ -34,7 +41,7 @@ export async function POST(req: NextRequest) {
   }
 
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(SESSION_COOKIE, sessionToken(customPass), {
+  res.cookies.set(SESSION_COOKIE, sessionToken(), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

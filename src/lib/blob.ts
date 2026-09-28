@@ -34,14 +34,15 @@ export function isBlobConfigured(): boolean {
 export async function readPortfolio(): Promise<Partial<Portfolio> | null> {
   if (!isBlobConfigured()) return null;
   try {
-    const { blobs } = await list({ prefix: PORTFOLIO_KEY, limit: 1 });
+    const { blobs } = await list({ prefix: PORTFOLIO_KEY, limit: 10 });
     const hit = blobs.find((b) => b.pathname === PORTFOLIO_KEY);
     if (!hit) return null;
     // Bust the CDN cache so admins see their own latest save immediately.
     const res = await fetch(`${hit.url}?t=${Date.now()}`, { cache: "no-store" });
     if (!res.ok) return null;
     return (await res.json()) as Partial<Portfolio>;
-  } catch {
+  } catch (err) {
+    console.error("readPortfolio error:", err);
     return null;
   }
 }

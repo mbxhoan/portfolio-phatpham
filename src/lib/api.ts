@@ -7,10 +7,10 @@
 import type { Portfolio } from "@/types/portfolio";
 
 /** Fetch the shared portfolio override (null when nothing is saved yet). */
-export async function fetchPortfolio(): Promise<Partial<Portfolio> | null> {
-  const res = await fetch("/api/portfolio", { cache: "no-store" });
-  if (!res.ok) return null;
-  return (await res.json()) as Partial<Portfolio> | null;
+export function fetchPortfolio(): Promise<Partial<Portfolio> | null> {
+  return fetch(`/api/portfolio?t=${Date.now()}`, { cache: "no-store" })
+    .then((res) => (res.ok ? res.json() : null))
+    .catch(() => null);
 }
 
 /** Persist the portfolio override. Returns true on success. */
@@ -56,7 +56,7 @@ export async function apiLogout(): Promise<void> {
 /** Whether the current browser has a valid admin session. */
 export async function apiSession(): Promise<boolean> {
   try {
-    const res = await fetch("/api/login", { cache: "no-store" });
+    const res = await fetch(`/api/login?t=${Date.now()}`, { cache: "no-store" });
     if (!res.ok) return false;
     const { authed } = (await res.json()) as { authed: boolean };
     return Boolean(authed);
