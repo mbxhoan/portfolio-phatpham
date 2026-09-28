@@ -76,6 +76,8 @@ export interface Project {
   tech: string[];
   /** Optional cover image (data URL or path). When set, replaces the initials logo block. */
   image?: string;
+  /** Detailed document content */
+  content?: string;
 }
 
 /** Editable site assets (data URLs or paths). */

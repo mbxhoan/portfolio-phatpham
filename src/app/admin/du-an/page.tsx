@@ -1,22 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2, FolderKanban } from "lucide-react";
-import { PageHead, Panel, Table, Th, Td, Badge, IconAction, AddButton, AdminButton, Modal, ConfirmDialog, Field, Input, Textarea, Checkbox, useToast } from "@/components/admin/ui";
-import { ImageUpload } from "@/components/admin/image-upload";
+import { Pencil, Trash2, FileText } from "lucide-react";
+import { PageHead, Panel, Table, Th, Td, Badge, IconAction, AddButton, AdminButton, Modal, ConfirmDialog, Field, Input, Textarea, useToast } from "@/components/admin/ui";
+import { DocumentProjectEditor } from "@/components/admin/document-project-editor";
 import { usePortfolio } from "@/lib/store";
 import type { Project } from "@/types/portfolio";
-
-type Draft = Pick<Project, "title" | "category" | "year" | "role" | "logo" | "summary" | "featured" | "image">;
-const empty: Draft = { title: "", category: "WMS", year: "2025", role: "Business Analyst", logo: "", summary: "", featured: true, image: undefined };
 
 export default function ProjectsAdmin() {
   const toast = useToast();
   const { data, update } = usePortfolio();
   const items = data.projects;
-  const [editing, setEditing] = useState<number | null>(null); // index or -1 for new
-  const [draft, setDraft] = useState<Draft>(empty);
-  const [confirm, setConfirm] = useState<number | null>(null);
+
+  // Editing state: null (list mode), -1 (new project), or index (editing existing project)
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
 
   const [headerOpen, setHeaderOpen] = useState(false);
   const [headerDraft, setHeaderDraft] = useState({
@@ -42,32 +40,45 @@ export default function ProjectsAdmin() {
     toast("Đã cập nhật tiêu đề & mô tả trang Dự án");
   }
 
-  function openNew() { setDraft(empty); setEditing(-1); }
-  function openEdit(i: number) { const p = items[i]; setDraft({ title: p.title, category: p.category, year: p.year, role: p.role, logo: p.logo, summary: p.summary, featured: p.featured, image: p.image }); setEditing(i); }
-
-  function save() {
-    if (!draft.title.trim()) return;
-    const slugify = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    if (editing === -1) {
-      const np: Project = { ...draft, logo: draft.logo || draft.title.slice(0, 2).toUpperCase(), slug: slugify(draft.title) || "du-an", problem: "", solution: "", impact: [], tech: [] };
-      update((d) => ({ ...d, projects: [np, ...d.projects] }));
-      toast("Đã thêm dự án mới");
-    } else if (editing !== null) {
-      const i = editing;
-      update((d) => ({ ...d, projects: d.projects.map((it, idx) => (idx === i ? { ...it, ...draft, logo: draft.logo || it.logo } : it)) }));
-      toast("Đã cập nhật dự án");
+  function handleSaveProject(saved: Project) {
+    if (editingIndex === -1) {
+      update((d) => ({ ...d, projects: [saved, ...d.projects] }));
+      toast("Đã tạo và đăng dự án mới");
+    } else if (editingIndex !== null) {
+      const idx = editingIndex;
+      update((d) => ({
+        ...d,
+        projects: d.projects.map((item, i) => (i === idx ? saved : item)),
+      }));
+      toast("Đã lưu các thay đổi của dự án");
     }
-    setEditing(null);
+    setEditingIndex(null);
   }
 
   function remove(i: number) {
     update((d) => ({ ...d, projects: d.projects.filter((_, idx) => idx !== i) }));
-    setConfirm(null); toast("Đã xóa dự án");
+    setConfirmDelete(null);
+    toast("Đã xóa dự án");
+  }
+
+  // If in Document Editor mode, render full-page workspace editor
+  if (editingIndex !== null) {
+    const currentProject = editingIndex >= 0 ? items[editingIndex] : {};
+    return (
+      <DocumentProjectEditor
+        project={currentProject}
+        onSave={handleSaveProject}
+        onCancel={() => setEditingIndex(null)}
+      />
+    );
   }
 
   return (
-    <div className="animate-fade-up">
-      <PageHead title="Dự án" subtitle="Thêm, chỉnh sửa và quản lý các dự án hiển thị trên website." />
+    <div className="animate-fade-up space-y-6">
+      <PageHead
+        title="Quản lý & Soạn thảo Dự án"
+        subtitle="Hệ thống Workspace Editor — Viết, biên tập và xuất bản bài viết tài liệu dự án trực tiếp trên Web."
+      />
 
       <Panel
         title={`Danh sách dự án (${items.length})`}
@@ -76,7 +87,9 @@ export default function ProjectsAdmin() {
             <AdminButton variant="ghost" onClick={openHeader}>
               <Pencil size={15} /> Sửa tiêu đề phần
             </AdminButton>
-            <AddButton onClick={openNew}>Thêm dự án</AddButton>
+            <AddButton onClick={() => setEditingIndex(-1)}>
+              <FileText size={16} className="mr-1" /> Thêm dự án mới
+            </AddButton>
           </div>
         }
       >
@@ -89,7 +102,8 @@ export default function ProjectsAdmin() {
             </div>
           </div>
         </div>
-        <Table head={<tr><Th>Dự án</Th><Th>Lĩnh vực</Th><Th>Năm</Th><Th>Trạng thái</Th><Th className="text-right">Hành động</Th></tr>}>
+
+        <Table head={<tr><Th>Dự án & Tài liệu</Th><Th>Lĩnh vực</Th><Th>Năm</Th><Th>Trạng thái</Th><Th className="text-right">Thao tác</Th></tr>}>
           {items.map((p, i) => (
             <tr key={p.slug + i} className="hover:bg-[#fcfbfd]">
               <Td>
@@ -113,8 +127,10 @@ export default function ProjectsAdmin() {
               <Td><Badge tone={p.featured ? "ok" : "read"}>{p.featured ? "Tiêu biểu" : "Ẩn"}</Badge></Td>
               <Td>
                 <div className="flex justify-end gap-2">
-                  <IconAction onClick={() => openEdit(i)}><Pencil size={16} /></IconAction>
-                  <IconAction tone="danger" onClick={() => setConfirm(i)}><Trash2 size={16} /></IconAction>
+                  <AdminButton variant="ghost" onClick={() => setEditingIndex(i)} className="!py-1.5 !px-3 text-xs">
+                    <Pencil size={14} className="mr-1" /> Soạn thảo
+                  </AdminButton>
+                  <IconAction tone="danger" onClick={() => setConfirmDelete(i)}><Trash2 size={16} /></IconAction>
                 </div>
               </Td>
             </tr>
@@ -152,36 +168,12 @@ export default function ProjectsAdmin() {
         </div>
       </Modal>
 
-      <Modal
-        open={editing !== null}
-        onClose={() => setEditing(null)}
-        title={editing === -1 ? "Thêm dự án" : "Chỉnh sửa dự án"}
-        footer={<><AdminButton variant="ghost" onClick={() => setEditing(null)}>Hủy</AdminButton><AdminButton onClick={save}>{editing === -1 ? "Thêm" : "Lưu"}</AdminButton></>}
-      >
-        <Field label="Tên dự án"><Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></Field>
-        <div className="grid grid-cols-2 gap-3.5">
-          <Field label="Lĩnh vực"><Input value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} /></Field>
-          <Field label="Năm"><Input value={draft.year} onChange={(e) => setDraft({ ...draft, year: e.target.value })} /></Field>
-        </div>
-        <div className="grid grid-cols-2 gap-3.5">
-          <Field label="Logo (chữ viết tắt)"><Input maxLength={4} value={draft.logo} onChange={(e) => setDraft({ ...draft, logo: e.target.value })} /></Field>
-          <Field label="Vai trò"><Input value={draft.role} onChange={(e) => setDraft({ ...draft, role: e.target.value })} /></Field>
-        </div>
-        <Field label="Tóm tắt"><Textarea value={draft.summary} onChange={(e) => setDraft({ ...draft, summary: e.target.value })} /></Field>
-        <Field label="Ảnh dự án (thay cho logo chữ)">
-          <ImageUpload
-            value={draft.image}
-            onChange={(image) => setDraft({ ...draft, image })}
-            placeholder={<FolderKanban size={20} />}
-            aspect="aspect-[4/3]"
-            widthClass="w-32"
-            maxDim={900}
-          />
-        </Field>
-        <Checkbox label="Hiển thị ở mục “Dự án tiêu biểu”" checked={draft.featured} onChange={(e) => setDraft({ ...draft, featured: e.target.checked })} />
-      </Modal>
-
-      <ConfirmDialog open={confirm !== null} label={confirm !== null ? items[confirm]?.title ?? "" : ""} onCancel={() => setConfirm(null)} onConfirm={() => confirm !== null && remove(confirm)} />
+      <ConfirmDialog
+        open={confirmDelete !== null}
+        label={confirmDelete !== null ? items[confirmDelete]?.title ?? "" : ""}
+        onCancel={() => setConfirmDelete(null)}
+        onConfirm={() => confirmDelete !== null && remove(confirmDelete)}
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, Check } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import { usePortfolio } from "@/lib/store";
+import { RichDocumentRenderer } from "@/components/common/rich-document-renderer";
 
 export function ProjectDetail({ slug }: { slug: string }) {
   const { data } = usePortfolio();
@@ -75,6 +76,15 @@ export function ProjectDetail({ slug }: { slug: string }) {
                   ))}
                 </ul>
               </div>
+
+              {p.content && (
+                <div className="mt-10 border-t border-[#e2e8f0] pt-8">
+                  <h2 className="mb-4 font-display text-[22px] font-extrabold text-navy">Chi tiết dự án</h2>
+                  <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-6 md:p-8">
+                    <RichDocumentRenderer content={p.content} />
+                  </div>
+                </div>
+              )}
             </div>
           </Reveal>
 
