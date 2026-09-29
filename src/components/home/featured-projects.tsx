@@ -17,6 +17,26 @@ export function FeaturedProjects() {
   const [isHovered, setIsHovered] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const [itemsToShow, setItemsToShow] = useState(3);
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
+  useEffect(() => {
+    const updateItemsToShow = () => {
+      if (window.innerWidth < 640) {
+        setItemsToShow(1);
+      } else if (window.innerWidth < 1024) {
+        setItemsToShow(2);
+      } else {
+        setItemsToShow(3);
+      }
+    };
+
+    updateItemsToShow();
+    window.addEventListener("resize", updateItemsToShow);
+    return () => window.removeEventListener("resize", updateItemsToShow);
+  }, []);
+
   const total = displayProjectsList.length;
 
   // Auto-slide every 1.5s
@@ -51,6 +71,31 @@ export function FeaturedProjects() {
     } else {
       setCurrentIndex((prev) => prev - 1);
     }
+  };
+
+  // Touch handlers for mobile swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
   };
 
   const handleTransitionEnd = () => {
@@ -96,15 +141,18 @@ export function FeaturedProjects() {
         ) : (
           /* Carousel Viewport */
           <div
-            className="overflow-hidden py-3"
+            className="overflow-hidden py-3 touch-pan-y"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             <div
               onTransitionEnd={handleTransitionEnd}
               className={`flex gap-6 ${isTransitioning ? "transition-transform duration-500 ease-in-out" : "transition-none"}`}
               style={{
-                transform: `translateX(calc(-${currentIndex} * (100% + 24px) / 3))`,
+                transform: `translateX(calc(-${currentIndex} * (100% + 24px) / ${itemsToShow}))`,
               }}
             >
               {displayList.map((p, i) => (

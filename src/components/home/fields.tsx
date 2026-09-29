@@ -16,6 +16,26 @@ export function Fields() {
   const [isHovered, setIsHovered] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const [itemsToShow, setItemsToShow] = useState(3);
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
+  useEffect(() => {
+    const updateItemsToShow = () => {
+      if (window.innerWidth < 640) {
+        setItemsToShow(1);
+      } else if (window.innerWidth < 1024) {
+        setItemsToShow(2);
+      } else {
+        setItemsToShow(3);
+      }
+    };
+
+    updateItemsToShow();
+    window.addEventListener("resize", updateItemsToShow);
+    return () => window.removeEventListener("resize", updateItemsToShow);
+  }, []);
+
   const total = fields.length;
 
   // Auto-slide every 1.5s
@@ -50,6 +70,31 @@ export function Fields() {
     } else {
       setCurrentIndex((prev) => prev - 1);
     }
+  };
+
+  // Touch handlers for mobile swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
   };
 
   // Seamless reset after sliding past total items
@@ -91,15 +136,18 @@ export function Fields() {
         ) : (
           /* Carousel Viewport */
           <div
-            className="overflow-hidden py-3"
+            className="overflow-hidden py-3 touch-pan-y"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             <div
               onTransitionEnd={handleTransitionEnd}
               className={`flex gap-6 ${isTransitioning ? "transition-transform duration-500 ease-in-out" : "transition-none"}`}
               style={{
-                transform: `translateX(calc(-${currentIndex} * (100% + 24px) / 3))`,
+                transform: `translateX(calc(-${currentIndex} * (100% + 24px) / ${itemsToShow}))`,
               }}
             >
               {displayFields.map((f, i) => (
@@ -107,12 +155,12 @@ export function Fields() {
                   key={`${f.name}-${i}`}
                   className="w-full sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] flex-none"
                 >
-                  <div className="group flex h-full flex-col gap-4 rounded-3xl bg-white p-8 sm:p-10 border border-transparent shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-200 hover:shadow-[0_20px_45px_-12px_rgba(37,99,235,0.18)]">
+                  <div className="group flex h-full flex-col gap-4 rounded-3xl bg-white p-6 sm:p-8 lg:p-10 border border-transparent shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-200 hover:shadow-[0_20px_45px_-12px_rgba(37,99,235,0.18)]">
                     <div className="grid h-16 w-16 flex-none place-items-center rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 border border-blue-100/80 group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm">
                       <Icon name={f.icon} className="h-7 w-7" />
                     </div>
-                    <h3 className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-200">{f.name}</h3>
-                    <p className="text-[15px] leading-relaxed text-slate-600">{f.body}</p>
+                    <h3 className="text-xl sm:text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-200 break-words">{f.name}</h3>
+                    <p className="text-[15px] leading-relaxed text-slate-600 break-words">{f.body}</p>
                   </div>
                 </div>
               ))}
